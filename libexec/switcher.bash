@@ -11,21 +11,23 @@ if [ "$HOME_SED_SAFE" -eq 0 ]; then
 fi
 
 handle_tmux_opts() {
-  bind_kill_session=$(get_tmux_option "@tmuxinoicer-kill-session" "alt-bspace")
-  bind_exit=$(get_tmux_option "@tmuxinoicer-abort" "esc")
-  bind_accept=$(get_tmux_option "@tmuxinoicer-accept" "enter")
-  bind_delete_char=$(get_tmux_option "@tmuxinoicer-delete-char" "bspace")
+  bind_kill_session=$(get_tmux_option "@tmux-switcher-kill-session" "alt-x")
+  bind_exit=$(get_tmux_option "@tmux-switcher-abort" "esc")
+  bind_accept=$(get_tmux_option "@tmux-switcher-accept" "enter")
+  bind_delete_char=$(get_tmux_option "@tmux-switcher-delete-char" "bspace")
 
-  window_size=$(get_tmux_option "@tmuxinoicer-window-size" "50%,50%")
+  window_size=$(get_tmux_option "@tmux-switcher-window-size" "50%,50%")
 
-  find_rooters=$(get_tmux_option '@tmuxinoicer-find-rooters' '.git')
-  zoxide_excludes=$(get_tmux_option "@tmuxinoicer-zoxide-excludes" ".git,/nix")
-  add_list_opt=$(get_tmux_option "@tmuxinoicer-extras" "find,zoxide")
+  find_base_dir=$(get_tmux_option '@tmux-switcher-find-base' "$HOME/data:1:4")
+  find_rooters=$(get_tmux_option '@tmux-switcher-find-rooters' '.git')
+  zoxide_excludes=$(get_tmux_option "@tmux-switcher-zoxide-excludes" ".git,/nix")
+  add_list_opt=$(get_tmux_option "@tmux-switcher-extras" "find")
 }
 
 get_find_list() {
   local -a base_dirs rooters rooter_opts
 
+  IFS=',' read -ra base_dirs <<<"$find_base_dir"
   IFS=',' read -ra rooters <<<"$find_rooters"
 
   for rooter in "${rooters[@]}"; do
@@ -114,8 +116,7 @@ menu() {
         fi
       done
     fi
-    # get_sessions_list "$1" && printf '\e[1;34m%-6s\e[m\n' "${result[@]}"
-    get_sessions_list "$1" && echo "${result[@]}"
+    get_sessions_list "$1" && printf '%-6s\n' "${result[@]}"
   else
     get_sessions_list "$1"
   fi
@@ -134,10 +135,12 @@ convert_keys() {
   fi
   echo "$keybind"
 }
+
 handle_fzf_args() {
   local switcher_path
+  # When using nix flakes $path_dir will be replaced by the actual nix store path
   path_dir="${TMUX_PLUGIN_MANAGER_PATH%/}"
-  switcher_path="$path_dir/tmuxinoicer/libexec/switcher.bash"
+  switcher_path="$path_dir/tmux-switcher/libexec/switcher.bash"
   current_session="$(tmux display-message -p '#S')"
   kill_session="$bind_kill_session:execute(tmux kill-session -t {})+reload(${switcher_path} menu sessions)"
 
@@ -161,7 +164,7 @@ run_fzf() {
       --no-sort \
       -p "$window_size" \
       --print-query \
-      --border-label="Current session: $current_session "
+      --border-label=" Current session: $current_session "
   )
 }
 

@@ -5,5 +5,5 @@ basedir="$(cd "$(dirname "$0")" && pwd)"
 
 key="$(get_tmux_option '@tmux-switcher-bind' '0')"
 if [[ -n "$key" ]]; then
-	tmux bind-key "$key" run-shell -b "${basedir}/libexec/switcher.bash"
+  tmux bind-key "$key" run-shell -b "${basedir}/libexec/switcher.bash"
 fi
