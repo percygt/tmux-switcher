@@ -18,10 +18,10 @@ handle_tmux_opts() {
 
   window_size=$(get_tmux_option "@tmux-switcher-window-size" "50%,50%")
 
-  find_base_dir=$(get_tmux_option '@tmux-switcher-find-base' "$HOME/data:1:4")
+  find_base_dir=$(get_tmux_option '@tmux-switcher-find-base' "$HOME")
   find_rooters=$(get_tmux_option '@tmux-switcher-find-rooters' '.git')
   zoxide_excludes=$(get_tmux_option "@tmux-switcher-zoxide-excludes" ".git,/nix")
-  add_list_opt=$(get_tmux_option "@tmux-switcher-extras" "find")
+  add_list_opt=$(get_tmux_option "@tmux-switcher-extras" "find,zoxide")
 }
 
 get_find_list() {
